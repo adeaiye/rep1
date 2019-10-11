@@ -1,0 +1,56 @@
+
+#set hostname
+hostnamectl set-hostname devminds
+#
+#
+#disable SELinux
+SERVER_NAME=$(hostname)
+echo "The name of the server is ${SERVER_NAME}."
+if cat /etc/os-release* | grep ID=\"centos\"
+then
+ sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+ echo "Firewall has been disabled permanently on this CENTos system"
+else
+  echo "You currently have the wrong OS, please run another script"
+fi
+echo "Exiting script.. completed successfully"
+#
+#
+#install core packages
+yum install epel-release yum-utils java-openjdk-devel java-openjdk -y
+#
+#Install packages
+yum update -y
+#install git
+yum install git -y
+#install wget
+yum install wget -y
+#curl
+yum install curl -y
+#install maven
+yum install maven -y
+#install java
+yum install java -y
+#install python3.6
+yum install python36 -y
+#install pip
+yum install python36-pip -y
+#
+#clear memory cache
+sync; echo 3 > /proc/sys/vm/drop_caches
+#
+#
+#install NGINX
+yum install nginx -y
+systemctl enable nginx
+systemctl start nginx
+#
+#
+#Open Firewall
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --reload
+#
+#
+#clone shopizer repo in AMI
+git clone https://github.com/dev-minds/dm_training_2019
